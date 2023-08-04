@@ -1,9 +1,8 @@
 package com.bolsadeideas.springboot.app.models.dao;
 
 import java.util.List;
-
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Repository;
 
 import com.bolsadeideas.springboot.app.models.entity.Cliente;
 
@@ -25,10 +24,29 @@ public class ClienteDaoImpl implements IClienteDao {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public Cliente findById(Long id) {
+		
+		return em.find(Cliente.class, id);
+	}
+
+	@Override
 	@Transactional
 	public void save(Cliente cliente) {
 		
-		em.persist(cliente);
+		if(cliente.getId() != null && cliente.getId() > 0) {
+			em.merge(cliente);
+		}else {
+			em.persist(cliente);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void delete(Long id) {
+		
+		em.remove(findById(id));
+		
 	}
 
 }
